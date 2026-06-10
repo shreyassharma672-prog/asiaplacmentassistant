@@ -6,8 +6,10 @@ import ThemeToggle from "./ThemeToggle";
 
 const navItems = [
   { label: "Home", to: "/" },
+  { label: "Dashboard", to: "/dashboard" },
   { label: "Resume Builder", to: "/resume-builder" },
   { label: "ATS Checker", to: "/ats-checker" },
+  { label: "Resume Analyzer", to: "/resume-analyzer" },
   { label: "Analyzer", to: "/analyzer" },
   { label: "Templates", to: "/templates" },
   { label: "Interview Prep", to: "/interview-prep" },

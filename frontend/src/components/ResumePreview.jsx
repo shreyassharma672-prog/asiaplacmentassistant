@@ -9,63 +9,31 @@ const previewClasses = {
   "Professional Clean": "border-l-4 border-slate-400",
 };
 
-function buildDraftPreview(formData, template, jobDescription) {
-  const lines = [
-    formData.name || "Your Name",
-    [formData.email, formData.phone].filter(Boolean).join(" | "),
-    [formData.linkedin, formData.github].filter(Boolean).join(" | "),
-    "",
-    "Professional Summary",
-    jobDescription
-      ? `Targeting a role aligned with: ${jobDescription.slice(0, 180)}${jobDescription.length > 180 ? "..." : ""}`
-      : "AI-generated professional summary will appear after resume generation.",
-    "",
-    "Education",
-    formData.education || "Add your education details.",
-    "",
-    "Skills",
-    formData.skills || "Add your technical and soft skills.",
-    "",
-    "Projects",
-    formData.projects || "Add your projects with tech stack and measurable impact.",
-    "",
-    "Experience",
-    formData.experience || "Add internship, work, or leadership experience.",
-    "",
-    "Achievements",
-    formData.achievements || "Add achievements, awards, and accomplishments.",
-    "",
-    "Certifications",
-    formData.certifications || "Add certifications and relevant courses.",
-    "",
-    `Template: ${template}`,
-  ];
-
-  return lines.filter((line, index) => line || lines[index - 1] !== "").join("\n");
-}
-
 export default function ResumePreview({
-  generatedResume,
-  formData,
-  template,
-  jobDescription,
-  profilePhoto,
+  generatedResume = "",
+  template = "ATS Friendly",
+  profilePhoto = null,
 }) {
-  const previewText =
-    generatedResume || buildDraftPreview(formData, template, jobDescription);
-  const isGenerated = Boolean(generatedResume);
+  const safeResume =
+    typeof generatedResume === "string"
+      ? generatedResume
+      : String(generatedResume || "");
+
+  const isGenerated = Boolean(safeResume.trim());
 
   return (
     <Card className="p-6">
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-600 dark:text-cyan-300">
-            Live Preview
+            Resume Preview
           </p>
+
           <h2 className="mt-2 text-2xl font-black text-slate-950 dark:text-white">
-            {isGenerated ? "Generated Resume" : "Draft Preview"}
+            {isGenerated ? "Generated Resume" : "Waiting for AI Resume"}
           </h2>
         </div>
+
         <div className="hidden rounded-full border border-slate-200 px-3 py-1 text-xs font-black uppercase tracking-wider text-slate-500 dark:border-white/10 dark:text-slate-400 sm:block">
           {template}
         </div>
@@ -75,7 +43,7 @@ export default function ResumePreview({
         id="resume-preview"
         className="min-h-[720px] rounded-3xl border border-slate-200 bg-white p-5 text-slate-950 shadow-xl dark:border-slate-800"
       >
-        {profilePhoto && (
+        {profilePhoto && typeof profilePhoto === "string" && (
           <img
             src={profilePhoto}
             alt="Profile"
@@ -83,22 +51,29 @@ export default function ResumePreview({
           />
         )}
 
-        <pre
-          className={`min-h-[650px] whitespace-pre-wrap rounded-2xl bg-white p-6 text-sm leading-8 text-slate-900 ${
-            previewClasses[template] || previewClasses["ATS Friendly"]
-          }`}
-        >
-          {previewText}
-        </pre>
-      </div>
+        {isGenerated ? (
+          <pre
+            className={`min-h-[650px] whitespace-pre-wrap rounded-2xl bg-white p-6 text-sm leading-8 text-slate-900 ${
+              previewClasses[template] || previewClasses["ATS Friendly"]
+            }`}
+          >
+            {safeResume}
+          </pre>
+        ) : (
+          <div className="flex min-h-[650px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+            <FileText size={42} className="mb-4 text-blue-500" />
 
-      {!isGenerated && (
-        <div className="mt-4 flex items-start gap-3 rounded-3xl border border-blue-400/20 bg-blue-500/10 p-4 text-sm leading-6 text-blue-700 dark:text-cyan-200">
-          <FileText size={18} className="mt-0.5 shrink-0" />
-          This preview updates as you type. Generate the resume to replace it
-          with AI-written content.
-        </div>
-      )}
+            <h3 className="text-xl font-black text-slate-900">
+              Fill your details and click Generate Resume
+            </h3>
+
+            <p className="mt-3 max-w-md text-sm leading-6 text-slate-500">
+              AI will correct spelling, improve grammar, and generate a polished
+              ATS-friendly resume after you click generate.
+            </p>
+          </div>
+        )}
+      </div>
     </Card>
   );
 }

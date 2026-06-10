@@ -24,3 +24,4 @@ export const STOP_WORDS = [
 
 export const RESUME_STORAGE_KEY = 'resumeHistory';
 export const RESUMES_STORAGE_KEY = 'resumes';
+export const SELECTED_TEMPLATE_STORAGE_KEY = 'selectedResumeTemplate';

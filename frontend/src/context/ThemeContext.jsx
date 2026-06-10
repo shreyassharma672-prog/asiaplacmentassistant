@@ -1,22 +1,27 @@
-import { createContext, useCallback, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useLayoutEffect, useMemo, useState } from "react";
 
 export const ThemeContext = createContext();
 
+function getStoredTheme() {
+  if (typeof window === "undefined") return "dark";
+  const savedTheme = localStorage.getItem("theme");
+  return savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark";
+}
+
+function applyTheme(theme) {
+  if (typeof document === "undefined") return;
+  document.documentElement.classList.toggle("dark", theme === "dark");
+}
+
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("theme") || "dark";
-    }
-    return "dark";
+    const initialTheme = getStoredTheme();
+    applyTheme(initialTheme);
+    return initialTheme;
   });
 
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
+  useLayoutEffect(() => {
+    applyTheme(theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
 

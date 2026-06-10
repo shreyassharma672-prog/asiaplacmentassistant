@@ -3,9 +3,11 @@ import { ThemeProvider } from "./context/ThemeContext";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
 import ResumeBuilder from "./pages/ResumeBuilder";
 import ATSChecker from "./pages/ATSChecker";
 import Analyzer from "./pages/Analyzer";
+import ResumeAnalyzer from "./pages/ResumeAnalyzer";
 import Templates from "./pages/Templates";
 import InterviewPrep from "./pages/InterviewPrep";
 import About from "./pages/About";
@@ -23,15 +25,16 @@ function App() {
           <main>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/resume-builder" element={<ResumeBuilder />} />
               <Route path="/ats-checker" element={<ATSChecker />} />
               <Route path="/analyzer" element={<Analyzer />} />
+              <Route path="/resume-analyzer" element={<ResumeAnalyzer />} />
               <Route path="/templates" element={<Templates />} />
               <Route path="/interview-prep" element={<InterviewPrep />} />
               <Route path="/about" element={<About />} />
               <Route path="/history" element={<History />} />
               <Route path="/builder" element={<Navigate to="/resume-builder" replace />} />
-              <Route path="/resume-analyzer" element={<Navigate to="/analyzer" replace />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>

@@ -7,6 +7,9 @@ const descriptions = {
   "Software Engineer": "Project-heavy structure for technical roles.",
   "Internship Resume": "Focused format for early career applications.",
   "Professional Clean": "Polished format for broad job applications.",
+  Minimal: "Lean format that keeps attention on content.",
+  Corporate: "Formal structure for enterprise applications.",
+  Creative: "Refined style with controlled visual personality.",
 };
 
 export default function TemplateSelector({ templates, selectedTemplate, onSelect }) {

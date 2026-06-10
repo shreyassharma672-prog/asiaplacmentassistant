@@ -1,23 +1,79 @@
 import { CheckCircle, FileText, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import PageHeader from "../components/PageHeader";
 import Section from "../components/Section";
 import TemplateCard from "../components/TemplateCard";
-import { RESUME_TEMPLATES } from "../utils/constants";
+import { SELECTED_TEMPLATE_STORAGE_KEY } from "../utils/constants";
 
-const descriptions = {
-  "ATS Friendly": "A clean, parser-safe resume for online application systems.",
-  "Modern Fresher": "Designed for students with education, projects, and achievements.",
-  "Software Engineer": "Optimized for technical skills, projects, tools, and measurable impact.",
-  "Internship Resume": "A sharp layout for internships, training programs, and early roles.",
-  "Professional Clean": "A polished structure for business, operations, and general roles.",
-  Minimal: "A lean template that keeps attention on content and readability.",
-  Corporate: "A formal format for enterprise applications and professional programs.",
-  Creative: "A refined layout with controlled personality and strong section flow.",
-};
+const TEMPLATE_DATA = [
+  {
+    name: "ATS Friendly",
+    category: "ATS",
+    preview: "Single-column parser safe",
+    description: "A clean, parser-safe resume for online application systems.",
+    features: ["Keyword-ready", "Simple headings", "Portal safe"],
+  },
+  {
+    name: "Modern Fresher",
+    category: "Campus",
+    preview: "Education and projects first",
+    description: "Designed for students with education, projects, and achievements.",
+    features: ["Fresher focused", "Project space", "Achievements"],
+  },
+  {
+    name: "Software Engineer",
+    category: "Tech",
+    preview: "Skills and impact layout",
+    description: "Optimized for technical skills, projects, tools, and measurable impact.",
+    features: ["Tech stack", "Projects", "Metrics"],
+  },
+  {
+    name: "Internship Resume",
+    category: "Internship",
+    preview: "Compact early-career profile",
+    description: "A sharp layout for internships, training programs, and early roles.",
+    features: ["Training", "Coursework", "Potential"],
+  },
+  {
+    name: "Professional Clean",
+    category: "Professional",
+    preview: "Polished recruiter scan",
+    description: "A polished structure for business, operations, and general roles.",
+    features: ["Balanced", "Readable", "Formal"],
+  },
+  {
+    name: "Minimal",
+    category: "Minimal",
+    preview: "Lean content-first format",
+    description: "A lean template that keeps attention on content and readability.",
+    features: ["Concise", "Whitespace", "Fast scan"],
+  },
+  {
+    name: "Corporate",
+    category: "Corporate",
+    preview: "Formal enterprise style",
+    description: "A formal format for enterprise applications and professional programs.",
+    features: ["Structured", "Executive", "Classic"],
+  },
+  {
+    name: "Creative",
+    category: "Creative",
+    preview: "Refined visual personality",
+    description: "A refined layout with controlled personality and strong section flow.",
+    features: ["Distinct", "Portfolio", "Modern"],
+  },
+];
 
 export default function Templates() {
+  const navigate = useNavigate();
+
+  const handleUseTemplate = (templateName) => {
+    localStorage.setItem(SELECTED_TEMPLATE_STORAGE_KEY, templateName);
+    navigate("/resume-builder", { state: { selectedTemplate: templateName } });
+  };
+
   return (
     <>
       <PageHeader
@@ -33,12 +89,15 @@ export default function Templates() {
       />
 
       <section className="mx-auto grid max-w-7xl gap-6 px-4 pb-8 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
-        {RESUME_TEMPLATES.map((template) => (
+        {TEMPLATE_DATA.map((template) => (
           <TemplateCard
-            key={template}
-            title={template}
-            description={descriptions[template]}
-            tags={template.includes("Engineer") ? ["Tech", "Projects"] : ["ATS-safe", "Clean"]}
+            key={template.name}
+            name={template.name}
+            category={template.category}
+            preview={template.preview}
+            description={template.description}
+            features={template.features}
+            onSelect={() => handleUseTemplate(template.name)}
           />
         ))}
       </section>

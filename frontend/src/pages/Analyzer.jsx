@@ -5,16 +5,47 @@ import Card from "../components/Card";
 import PageHeader from "../components/PageHeader";
 import ReportMetric from "../components/ReportMetric";
 import Toast from "../components/Toast";
+import { resumeApi } from "../api/axiosConfig";
 import { analyzeResume } from "../utils/resumeAnalyzer";
 
 const textareaClass =
   "min-h-[420px] w-full resize-y rounded-3xl border border-slate-200 bg-white/80 px-5 py-4 text-sm leading-7 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-400/10 dark:border-white/10 dark:bg-white/[0.06] dark:text-white dark:placeholder:text-slate-500";
+
+const ACCEPTED_RESUME_EXTENSIONS = ["pdf", "doc", "docx", "txt"];
+const ACCEPTED_RESUME_MIME_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "text/plain",
+  "application/octet-stream",
+];
 
 function getLevel(score) {
   if (score >= 80) return { label: "Excellent", tone: "green" };
   if (score >= 60) return { label: "Good", tone: "blue" };
   if (score >= 40) return { label: "Average", tone: "violet" };
   return { label: "Needs Work", tone: "red" };
+}
+
+function getFileExtension(fileName = "") {
+  return fileName.split(".").pop()?.toLowerCase() || "";
+}
+
+function isAllowedResumeFile(file) {
+  const extension = getFileExtension(file.name);
+  return (
+    ACCEPTED_RESUME_EXTENSIONS.includes(extension) ||
+    ACCEPTED_RESUME_MIME_TYPES.includes(file.type)
+  );
+}
+
+function readTextFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(new Error("Unable to read TXT file"));
+    reader.readAsText(file);
+  });
 }
 
 export default function Analyzer() {
@@ -46,12 +77,50 @@ export default function Analyzer() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (file.type === "text/plain") {
-      const text = await file.text();
+    const extension = getFileExtension(file.name);
+    if (!isAllowedResumeFile(file)) {
+      setToast({ message: "Upload PDF, DOC, DOCX, or TXT only.", type: "error" });
+      event.target.value = "";
+      return;
+    }
+
+    if (extension === "txt" || file.type === "text/plain") {
+      try {
+        const text = await readTextFile(file);
+        setResume(text);
+        setAnalysis(null);
+        setToast({ message: "Resume uploaded successfully", type: "success" });
+      } catch (error) {
+        setToast({ message: error.message || "Unable to read TXT file", type: "error" });
+      }
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("resume", file);
+
+    setLoading(true);
+    try {
+      const response = await resumeApi.extractResume(formData);
+      const text = String(response.data?.text || "");
+
+      if (!text.trim()) {
+        throw new Error("Could not extract text from resume. The file may be empty or scanned.");
+      }
+
       setResume(text);
-      setToast({ message: "Resume uploaded successfully", type: "success" });
-    } else {
-      setToast({ message: "Only TXT upload is supported here. Paste PDF or DOCX text manually.", type: "error" });
+      setAnalysis(null);
+      setToast({ message: "Resume text extracted successfully", type: "success" });
+    } catch (error) {
+      setToast({
+        message:
+          error.response?.data?.error ||
+          error.message ||
+          "Unable to extract resume text",
+        type: "error",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,8 +148,8 @@ export default function Analyzer() {
             </div>
             <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15">
               <Upload size={18} />
-              Upload TXT
-              <input type="file" accept=".txt" className="hidden" onChange={handleResumeUpload} />
+              Upload
+              <input type="file" accept=".pdf,.doc,.docx,.txt" className="hidden" onChange={handleResumeUpload} />
             </label>
           </div>
           <textarea
