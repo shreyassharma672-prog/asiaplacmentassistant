@@ -14,6 +14,7 @@ import { resumeApi } from "../api/axiosConfig";
 import { downloadAsText, exportToDOCX, exportToPDF } from "../utils/exporters";
 import { calculateATSScore } from "../utils/atsScoring";
 import { RESUME_TEMPLATES, SELECTED_TEMPLATE_STORAGE_KEY } from "../utils/constants";
+import { trackEvent } from "../utils/analytics";
 
 const RESUME_STORAGE_KEY = "resumeHistory";
 const FORM_STORAGE_KEY = "resumeFormData";
@@ -216,6 +217,11 @@ export default function ResumeBuilder() {
       setGeneratedResume(resumeText);
       setAtsReport(report);
       saveHistory(resumeText, report);
+      trackEvent("Resume Generated", {
+        feature: "resume_builder",
+        template,
+        has_job_description: Boolean(jobDescription.trim()),
+      });
 
       setToast({
         message: "Resume generated successfully",
@@ -252,8 +258,16 @@ export default function ResumeBuilder() {
 
     try {
       if (format === "pdf") {
+        trackEvent("PDF Export Clicked", {
+          feature: "resume_builder",
+          export_format: "pdf",
+        });
         await exportToPDF("resume-preview", "resume.pdf", generatedResume);
       } else if (format === "docx") {
+        trackEvent("DOCX Export Clicked", {
+          feature: "resume_builder",
+          export_format: "docx",
+        });
         exportToDOCX(generatedResume, "resume.docx");
       } else {
         downloadAsText(generatedResume, "resume.txt");

@@ -15,6 +15,7 @@ import Card from "../components/Card";
 import KeywordChips from "../components/KeywordChips";
 import PageHeader from "../components/PageHeader";
 import Toast from "../components/Toast";
+import { trackEvent } from "../utils/analytics";
 
 const ACCEPTED_EXTENSIONS = ["pdf", "doc", "docx", "txt"];
 const ACCEPTED_MIME_TYPES = [
@@ -208,6 +209,11 @@ export default function ResumeAnalyzer() {
 
       const response = await resumeApi.analyzeUploadedResume(formData);
       setAnalysis(response.data || null);
+      trackEvent("Resume Analyzed", {
+        feature: "resume_analyzer",
+        source: "uploaded_resume",
+        has_job_description: Boolean(jobDescription.trim()),
+      });
       setToast({ message: "Resume analysis complete", type: "success" });
     } catch (error) {
       const message =

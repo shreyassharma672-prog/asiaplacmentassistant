@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Brain, FileText, Sparkles, Target } from "lucide-react";
 import Button from "../components/Button";
 import Card from "../components/Card";
@@ -17,6 +17,7 @@ import {
   starExample,
   technicalCategories,
 } from "../data/interviewPrepData";
+import { trackEvent } from "../utils/analytics";
 
 export default function InterviewPrep() {
   const technicalCategoryNames = Object.keys(technicalCategories);
@@ -26,6 +27,12 @@ export default function InterviewPrep() {
   const [aiResponse, setAiResponse] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [toast, setToast] = useState(null);
+
+  useEffect(() => {
+    trackEvent("Interview Prep Opened", {
+      feature: "interview_prep",
+    });
+  }, []);
 
   const handleCopy = async (text) => {
     try {

@@ -8,6 +8,7 @@ import PageHeader from "../components/PageHeader";
 import Toast from "../components/Toast";
 import { resumeApi } from "../api/axiosConfig";
 import { IMPORTANT_SKILLS, STOP_WORDS } from "../utils/constants";
+import { trackEvent } from "../utils/analytics";
 
 const ATS_HISTORY_KEY = "atsHistory";
 const ACCEPTED_RESUME_EXTENSIONS = ["pdf", "doc", "docx", "txt"];
@@ -327,6 +328,10 @@ export default function ATSChecker() {
       setReport(nextReport);
       setAiResponse("");
       persistHistory(nextReport, "");
+      trackEvent("ATS Checked", {
+        feature: "ats_checker",
+        source: "local_scoring",
+      });
       setToast({ message: "ATS score calculated locally", type: "success" });
       setLoading(false);
     }, 250);

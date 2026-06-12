@@ -1,4 +1,5 @@
-import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -12,11 +13,23 @@ import Templates from "./pages/Templates";
 import InterviewPrep from "./pages/InterviewPrep";
 import About from "./pages/About";
 import History from "./pages/History";
+import { trackPageView } from "./utils/analytics";
+
+function AnalyticsPageTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    trackPageView(`${location.pathname}${location.search}`);
+  }, [location.pathname, location.search]);
+
+  return null;
+}
 
 function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
+        <AnalyticsPageTracker />
         <div className="min-h-screen overflow-hidden bg-slate-50 text-slate-950 transition-colors duration-300 dark:bg-slate-950 dark:text-white">
           <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.22),transparent_34%),radial-gradient(circle_at_top_right,rgba(124,58,237,0.22),transparent_30%),linear-gradient(180deg,#020617_0%,#0f172a_44%,#f8fafc_44%,#f8fafc_100%)] opacity-0 dark:opacity-100" />
           <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_28%),radial-gradient(circle_at_top_right,rgba(6,182,212,0.12),transparent_28%)] dark:hidden" />

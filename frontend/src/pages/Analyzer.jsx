@@ -7,6 +7,7 @@ import ReportMetric from "../components/ReportMetric";
 import Toast from "../components/Toast";
 import { resumeApi } from "../api/axiosConfig";
 import { analyzeResume } from "../utils/resumeAnalyzer";
+import { trackEvent } from "../utils/analytics";
 
 const textareaClass =
   "min-h-[420px] w-full resize-y rounded-3xl border border-slate-200 bg-white/80 px-5 py-4 text-sm leading-7 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-400/10 dark:border-white/10 dark:bg-white/[0.06] dark:text-white dark:placeholder:text-slate-500";
@@ -64,6 +65,10 @@ export default function Analyzer() {
     window.setTimeout(() => {
       try {
         setAnalysis(analyzeResume(resume));
+        trackEvent("Resume Analyzed", {
+          feature: "resume_analyzer",
+          source: "pasted_resume",
+        });
         setToast({ message: "Resume analysis complete", type: "success" });
       } catch {
         setToast({ message: "Error analyzing resume", type: "error" });

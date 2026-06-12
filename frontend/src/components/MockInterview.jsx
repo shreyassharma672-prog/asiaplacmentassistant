@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Brain, CheckCircle, Target } from "lucide-react";
 import Button from "./Button";
 import Card from "./Card";
+import { trackEvent } from "../utils/analytics";
 
 export default function MockInterview({ roles }) {
   const roleNames = Object.keys(roles);
@@ -18,6 +19,11 @@ export default function MockInterview({ roles }) {
   );
 
   const startInterview = () => {
+    trackEvent("Interview Prep Opened", {
+      feature: "interview_prep",
+      action: "mock_interview_started",
+      role: selectedRole,
+    });
     setStarted(true);
     setFinished(false);
     setCurrentIndex(0);
